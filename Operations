@@ -1,0 +1,45 @@
+import csv
+Names = ["Casado","Yuan","Hall","Handler","Elfassy", "Pilgrim","total"]
+Days = []
+for x in xrange(4):
+    nDict = {}
+    for name in Names:
+        nDict[name] = 0
+    Days.append(nDict)
+
+#Names = {}
+#Names["Casado"] = 0
+#Names["Yuan"] = 0
+#Names["Hall"] = 0
+#Names["Handler"] = 0
+#Names["Elfassy"] = 0
+#Names["total"] = 0
+def createScore(link,Names):
+    with open(link,'U') as csvfile:
+        spamreader = csv.reader(csvfile,delimiter = ' ',quotechar = ',')
+        for row in spamreader:
+            last = len(row)
+            cellName = row[last-1]
+            for name in Names.keys():
+                if(name in cellName):
+                    Names[name] += 1
+                    Names["total"] += 1
+
+#with open("Result2.txt","w") as text_file:
+ #   for i in xrange(4):
+  #      nDict = Days[i]
+   #     day = str(11 + i)
+    #    link = "Scrap_File_06_"+day+"_13.csv"
+     #   createScore(link,nDict)
+      #  date = link[11:19]
+       # output = date + str(nDict)+"\n"
+        #text_file.write(output)
+
+#createScore("Scrap_File_06_17_13.csv",Days[0])
+createScore("Scrap_File_06_27_13.csv",Days[1])
+#with open("Result.txt","w") as text_file:
+ # output = "06-17-13" + str(Days[0]) +"\n"
+  #output2 = "06-21-13" + str(Days[1]) +"\n"
+  #text_file.write(output + output2)
+
+print Days[1]
