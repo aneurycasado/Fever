@@ -1,0 +1,75 @@
+import urllib2
+from csv import DictWriter
+from bs4 import BeautifulSoup
+import unicodedata
+
+link = BeautifulSoup(urllib2.urlopen('http://nymag.com/search/search.cgi?t=bar;rpp=1800').read())
+
+
+Dictionary = []
+for club in link.find_all("dt"):
+    clubD = {}
+    try:
+        link = club.a.get('href')
+        try:
+            secondLink = BeautifulSoup(urllib2.urlopen(link).read())
+            for individual in secondLink.find_all("meta"):
+                marker = individual.get("name")
+                content = individual.get("content")
+                if(marker == "headline"):
+                    clubD["name"] = content
+                elif(marker == "nyml_address"):
+                    clubD["address"] = content
+                elif(marker == "nyml_address_borough"):
+                    clubD["borough"] = content
+                elif(marker == "nyml_address_latitude"):
+                    clubD["latitude"] = content
+                elif(marker == "nyml_address_longitude"):
+                    clubD["longitude"] = content
+                elif(marker == "nyml_address_neighborhood"):
+                    clubD["neighborhood"] = content
+                elif(marker == "nyml_address_zip"):
+                    clubD["zip"] = content
+                elif(marker == "nyml_hours"):
+                    clubD["hours"] = content
+                elif(marker == "nyml_long_magazine_blurb"):
+                    clubD["longBlurb"] = content
+                elif(marker == "nyml_main_website_blurb"):
+                    clubD["shortBlurb"] = content
+                elif(marker == "nyml_prices"):
+                    clubD["prices"] = content
+                elif(marker == "nyml_photo_url"):
+                    clubD["photoUrl"] = content
+                elif(marker == "nyml_website_url"):
+                    clubD["website"] = content[0:4] +"://"+ content[13:]
+                elif(marker == "nyml_address_additional_neighborhoods"):
+                    clubD["otherNeighborHood"] = content
+                elif(marker == "nyml_address_subway_stops"):
+                    clubD["subwayStops"] = content
+                elif(marker == "nyml_phone"):
+                    clubD["phone"] = content
+                elif(marker == "nyml_alternate_name"):
+                     clubD["otherName"] = content
+                elif(marker == "nyml_happy_hour"):
+                     clubD["happyHour"] = content
+                elif(marker == "nyml_happy_hour_days"):
+                     clubD["happyHourDays"] = content
+                elif(marker == "payment_methods_accepted"):
+                     clubD["paymentMethods"] = content
+                elif(marker == "nyml_type"):
+                     clubD["type"] = content
+                else:
+                    pass 
+        except:
+            pass
+        Dictionary.append(clubD)
+    except:
+        pass
+
+with open('BigScrape.csv','w') as outfile:
+    writer = DictWriter(outfile,("name","otherName","address","zip","borough","neighborhood","otherNeighborHood","latitude","longitude","subwayStops","prices","paymentMethods","hours","phone","happyHour","happyHourDays","type","website","shortBlurb","longBlurb","photoUrl") )
+    writer.writeheader()
+    for c in Dictionary:
+        for k in c.keys():
+            c[k] = unicodedata.normalize('NFKD',c[k]).encode('ascii','ignore').strip()
+        writer.writerow(c)
